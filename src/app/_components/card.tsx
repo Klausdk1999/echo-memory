@@ -43,7 +43,7 @@ const Card: React.FC<CardProps> = ({
           <img
             src="/media/front.png"
             alt="Parrot Front"
-            className="absolute h-full w-full"
+            className="absolute h-full w-full p-2"
           />
         )}
       </div>

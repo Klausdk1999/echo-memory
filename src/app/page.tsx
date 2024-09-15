@@ -68,6 +68,7 @@ const MemoryGame: React.FC = () => {
   }, [ncards, setupGame]);
 
   const handleCardClick = (card: CardType) => {
+    if (previousCard?.id === card.id) return;
     setNClicks((prev) => prev + 1);
 
     setCards((prev) =>
@@ -109,33 +110,18 @@ const MemoryGame: React.FC = () => {
     }
   };
 
-  //   const handleVoiceCommand = (command: string) => {
-  //     // Implement basic voice commands (start, restart, select card by number)
-  //     console.log(`Voice command received: ${command}`);
-  //   };
-
-  //   // Voice recognition setup
-  //   useEffect(() => {
-  //     if ("webkitSpeechRecognition" in window) {
-  //       const recognition = new (window as any).webkitSpeechRecognition();
-  //       recognition.lang = "en-US";
-  //       recognition.interimResults = false;
-  //       recognition.maxAlternatives = 1;
-
-  //       recognition.onresult = (event: any) => {
-  //         const command = event.results[0][0].transcript.toLowerCase();
-  //         handleVoiceCommand(command);
-  //       };
-
-  //       recognition.start();
-  //     }
-  //   }, []);
-
   return (
-    <div className="container mx-auto">
-      <h1 className="mb-4 text-center text-4xl font-bold">Memory Game</h1>
-      <p className="mb-4 text-center text-xl">Timer: {timer} seconds</p>
-      <div className={`grid grid-cols-4 items-center justify-center gap-4`}>
+    <section className="container mx-auto h-[100vh] w-full bg-green-100 p-8">
+      <div className="flex justify-center">
+        <h1 className="mb-4 w-fit rounded-xl border-4 border-green-600 bg-green-200 p-2 text-center text-4xl font-bold text-green-900">
+          Papagaios da Memória
+        </h1>
+      </div>
+
+      <p className="mb-4 text-center text-xl">Timer: {timer} segundos</p>
+      <div
+        className={`grid min-h-[150px] grid-cols-4 items-center justify-center gap-4 rounded-lg border-4 border-slate-200 bg-slate-50 p-6 shadow-md`}
+      >
         {cards.map((card, index) => (
           <Card
             key={index}
@@ -150,24 +136,24 @@ const MemoryGame: React.FC = () => {
       <div className="mt-4 flex justify-center gap-4">
         <button
           onClick={() => setNcards(4)}
-          className="rounded-lg bg-green-300 p-3"
+          className="rounded-lg bg-green-300 p-3 shadow-md"
         >
-          Play 4 Cards
+          4 Cartas
         </button>
         <button
           onClick={() => setNcards(6)}
-          className="rounded-lg bg-green-300 p-3"
+          className="rounded-lg bg-green-300 p-3 shadow-md"
         >
-          Play 6 Cards
+          6 Cartas
         </button>
         <button
           onClick={() => setNcards(8)}
-          className="rounded-lg bg-green-300 p-3"
+          className="rounded-lg bg-green-300 p-3 shadow-md"
         >
-          Play 8 Cards
+          8 Cartas
         </button>
       </div>
-    </div>
+    </section>
   );
 };
 
