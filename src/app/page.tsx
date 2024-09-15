@@ -1,67 +1,175 @@
-import Link from "next/link";
+"use client";
+import React, { useState, useEffect, useCallback } from "react";
+import Card from "./_components/card";
+import { Howl } from "howler";
 
-import { LatestPost } from "@/app/_components/post";
-import { getServerAuthSession } from "@/server/auth";
-import { api, HydrateClient } from "@/trpc/server";
+// Define types for parrots and cards
+type CardType = {
+  id: number;
+  parrot: string;
+  isFlipped: boolean;
+};
 
-export default async function Home() {
-  const hello = await api.post.hello({ text: "from tRPC" });
-  const session = await getServerAuthSession();
+// Parrot names and their respective sound file paths
+const parrots: string[] = [
+  "bobrossparrot",
+  "explodyparrot",
+  "fiestaparrot",
+  "metalparrot",
+  "revertitparrot",
+  "tripletsparrot",
+  "unicornparrot",
+];
+const winSound = new Howl({ src: ["/sounds/win.wav"] });
+const loseSound = new Howl({ src: ["/sounds/lose.wav"] });
+const sounds: string[] = parrots.map((parrot) => `/sounds/flip.wav`); // Add sound files in public/sounds /sounds/${parrot}.mp3
 
-  void api.post.getLatest.prefetch();
+// Shuffle an array
+const shuffleArray = <T,>(array: T[]): T[] => {
+  return array.sort(() => Math.random() - 0.5);
+};
+
+const MemoryGame: React.FC = () => {
+  const [ncards, setNcards] = useState<number>(0);
+  const [cards, setCards] = useState<CardType[]>([]);
+  const [nClicks, setNClicks] = useState<number>(0);
+  const [timer, setTimer] = useState<number>(0);
+  const [previousCard, setPreviousCard] = useState<CardType>();
+
+  useEffect(() => {
+    const interval = setInterval(() => setTimer((t) => t + 1), 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const playGameStartSound = () => {
+    const startSound = new Howl({ src: ["/sounds/start.wav"] });
+    startSound.play();
+  };
+
+  const setupGame = useCallback(() => {
+    const positions = shuffleArray([
+      ...Array(ncards / 2).keys(),
+      ...Array(ncards / 2).keys(),
+    ]);
+
+    const cardSet = positions.map((pos, i) => ({
+      id: i,
+      parrot: parrots[pos] ?? "defaultparrot",
+      isFlipped: false,
+    }));
+
+    setCards(cardSet);
+    setNClicks(0);
+    setTimer(0);
+    playGameStartSound();
+  }, [ncards]);
+
+  useEffect(() => {
+    setupGame();
+  }, [ncards, setupGame]);
+
+  const handleCardClick = (card: CardType) => {
+    setNClicks((prev) => prev + 1);
+
+    setCards((prev) =>
+      prev.map((c) =>
+        c.id === card.id ? { ...c, isFlipped: !c.isFlipped } : c,
+      ),
+    );
+
+    if (previousCard === undefined) {
+      setPreviousCard(card);
+    } else {
+      if (previousCard.parrot === card.parrot) {
+        setPreviousCard(undefined);
+        winSound.play();
+        setTimeout(() => checkWin(), 1000);
+      } else {
+        loseSound.play();
+        setTimeout(() => {
+          setCards((prev) =>
+            prev.map((mapCard) =>
+              mapCard.parrot === previousCard.parrot ||
+              mapCard.parrot === card.parrot
+                ? { ...mapCard, isFlipped: false }
+                : mapCard,
+            ),
+          );
+          setPreviousCard(undefined);
+        }, 1000);
+      }
+    }
+  };
+
+  const checkWin = () => {
+    if (cards.every((card) => card.isFlipped)) {
+      winSound.play();
+      alert(`You won in ${nClicks} clicks and ${timer} seconds!`);
+      setCards([]);
+      setupGame();
+    }
+  };
+
+  //   const handleVoiceCommand = (command: string) => {
+  //     // Implement basic voice commands (start, restart, select card by number)
+  //     console.log(`Voice command received: ${command}`);
+  //   };
+
+  //   // Voice recognition setup
+  //   useEffect(() => {
+  //     if ("webkitSpeechRecognition" in window) {
+  //       const recognition = new (window as any).webkitSpeechRecognition();
+  //       recognition.lang = "en-US";
+  //       recognition.interimResults = false;
+  //       recognition.maxAlternatives = 1;
+
+  //       recognition.onresult = (event: any) => {
+  //         const command = event.results[0][0].transcript.toLowerCase();
+  //         handleVoiceCommand(command);
+  //       };
+
+  //       recognition.start();
+  //     }
+  //   }, []);
 
   return (
-    <HydrateClient>
-      <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
-        <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
-          <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
-            Create <span className="text-[hsl(280,100%,70%)]">T3</span> App
-          </h1>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
-            <Link
-              className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
-              href="https://create.t3.gg/en/usage/first-steps"
-              target="_blank"
-            >
-              <h3 className="text-2xl font-bold">First Steps →</h3>
-              <div className="text-lg">
-                Just the basics - Everything you need to know to set up your
-                database and authentication.
-              </div>
-            </Link>
-            <Link
-              className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
-              href="https://create.t3.gg/en/introduction"
-              target="_blank"
-            >
-              <h3 className="text-2xl font-bold">Documentation →</h3>
-              <div className="text-lg">
-                Learn more about Create T3 App, the libraries it uses, and how
-                to deploy it.
-              </div>
-            </Link>
-          </div>
-          <div className="flex flex-col items-center gap-2">
-            <p className="text-2xl text-white">
-              {hello ? hello.greeting : "Loading tRPC query..."}
-            </p>
-
-            <div className="flex flex-col items-center justify-center gap-4">
-              <p className="text-center text-2xl text-white">
-                {session && <span>Logged in as {session.user?.name}</span>}
-              </p>
-              <Link
-                href={session ? "/api/auth/signout" : "/api/auth/signin"}
-                className="rounded-full bg-white/10 px-10 py-3 font-semibold no-underline transition hover:bg-white/20"
-              >
-                {session ? "Sign out" : "Sign in"}
-              </Link>
-            </div>
-          </div>
-
-          {session?.user && <LatestPost />}
-        </div>
-      </main>
-    </HydrateClient>
+    <div className="container mx-auto">
+      <h1 className="mb-4 text-center text-4xl font-bold">Memory Game</h1>
+      <p className="mb-4 text-center text-xl">Timer: {timer} seconds</p>
+      <div className={`grid grid-cols-4 items-center justify-center gap-4`}>
+        {cards.map((card, index) => (
+          <Card
+            key={index}
+            id={card.id}
+            parrot={card.parrot}
+            isFlipped={card.isFlipped}
+            handleClick={() => handleCardClick(card)}
+            sound={sounds[card.id]}
+          />
+        ))}
+      </div>
+      <div className="mt-4 flex justify-center gap-4">
+        <button
+          onClick={() => setNcards(4)}
+          className="rounded-lg bg-green-300 p-3"
+        >
+          Play 4 Cards
+        </button>
+        <button
+          onClick={() => setNcards(6)}
+          className="rounded-lg bg-green-300 p-3"
+        >
+          Play 6 Cards
+        </button>
+        <button
+          onClick={() => setNcards(8)}
+          className="rounded-lg bg-green-300 p-3"
+        >
+          Play 8 Cards
+        </button>
+      </div>
+    </div>
   );
-}
+};
+
+export default MemoryGame;
