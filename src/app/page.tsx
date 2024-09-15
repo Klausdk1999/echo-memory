@@ -3,14 +3,12 @@ import React, { useState, useEffect, useCallback } from "react";
 import Card from "./_components/card";
 import { Howl } from "howler";
 
-// Define types for parrots and cards
 type CardType = {
   id: number;
   parrot: string;
   isFlipped: boolean;
 };
 
-// Parrot names and their respective sound file paths
 const parrots: string[] = [
   "bobrossparrot",
   "explodyparrot",
@@ -24,7 +22,6 @@ const winSound = new Howl({ src: ["/sounds/win.wav"] });
 const loseSound = new Howl({ src: ["/sounds/lose.wav"] });
 const sounds: string[] = parrots.map((parrot) => `/sounds/flip.wav`); // Add sound files in public/sounds /sounds/${parrot}.mp3
 
-// Shuffle an array
 const shuffleArray = <T,>(array: T[]): T[] => {
   return array.sort(() => Math.random() - 0.5);
 };
@@ -37,9 +34,11 @@ const MemoryGame: React.FC = () => {
   const [previousCard, setPreviousCard] = useState<CardType>();
 
   useEffect(() => {
-    const interval = setInterval(() => setTimer((t) => t + 1), 1000);
-    return () => clearInterval(interval);
-  }, []);
+    if (ncards && ncards % 2 === 0) {
+      const interval = setInterval(() => setTimer((t) => t + 1), 1000);
+      return () => clearInterval(interval);
+    }
+  }, [ncards]);
 
   const playGameStartSound = () => {
     const startSound = new Howl({ src: ["/sounds/start.wav"] });
