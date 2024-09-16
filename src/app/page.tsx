@@ -2,13 +2,16 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Card from "./_components/card";
 import { Howl } from "howler";
+import VoiceCommand from "./_components/speech";
 
-type CardType = {
+// Define types for the cards
+export type CardType = {
   id: number;
   parrot: string;
   isFlipped: boolean;
 };
 
+// Define parrot names and sounds
 const parrots: string[] = [
   "bobrossparrot",
   "explodyparrot",
@@ -18,20 +21,21 @@ const parrots: string[] = [
   "tripletsparrot",
   "unicornparrot",
 ];
+
 const winSound = new Howl({ src: ["/sounds/win.wav"] });
 const loseSound = new Howl({ src: ["/sounds/lose.wav"] });
-const sounds: string[] = parrots.map((parrot) => `/sounds/flip.wav`); // Add sound files in public/sounds /sounds/${parrot}.mp3
+const sounds: string[] = parrots.map((parrot) => `/sounds/flip.wav`); // Add sound files in public/sounds
 
 const shuffleArray = <T,>(array: T[]): T[] => {
   return array.sort(() => Math.random() - 0.5);
 };
 
 const MemoryGame: React.FC = () => {
-  const [ncards, setNcards] = useState<number>(0);
+  const [ncards, setNcards] = useState<number>(4);
   const [cards, setCards] = useState<CardType[]>([]);
   const [nClicks, setNClicks] = useState<number>(0);
   const [timer, setTimer] = useState<number>(0);
-  const [previousCard, setPreviousCard] = useState<CardType>();
+  const [previousCard, setPreviousCard] = useState<CardType | undefined>();
 
   useEffect(() => {
     if (ncards && ncards % 2 === 0) {
@@ -117,10 +121,14 @@ const MemoryGame: React.FC = () => {
           Papagaios da Memória
         </h1>
       </div>
-
+      <VoiceCommand
+        startGame={setupGame}
+        selectCard={handleCardClick}
+        selectNumberOfCards={setNcards}
+      />
       <p className="mb-4 text-center text-xl">Timer: {timer} segundos</p>
       <div
-        className={`grid min-h-[150px] grid-cols-4 items-center justify-center gap-4 rounded-lg border-4 border-slate-200 bg-slate-50 p-6 shadow-md`}
+        className={`grid min-h-[150px] grid-cols-2 items-center justify-center gap-4 rounded-lg border-4 border-slate-200 bg-slate-50 p-6 shadow-md`}
       >
         {cards.map((card, index) => (
           <Card
