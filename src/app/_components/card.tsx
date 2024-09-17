@@ -1,54 +1,75 @@
 import React from "react";
-import { Howl } from "howler";
+import { type Howl } from "howler";
+import { cn } from "@/lib/utils"; // Utility class for conditional classnames
+import Image from "next/image";
 
-interface CardProps {
+interface MemoryCardProps {
   id: number;
   parrot: string;
   isFlipped: boolean;
   handleClick: () => void;
-  sound?: string; // path to the sound for this card
+  sound?: Howl; // path to the sound for this card
 }
 
-const Card: React.FC<CardProps> = ({
+const MemoryCard: React.FC<MemoryCardProps> = ({
   id,
   parrot,
   isFlipped,
   handleClick,
   sound,
 }) => {
-  const playSound = () => {
-    if (!sound) return;
-    const soundFile = new Howl({ src: [sound] });
-    soundFile.play();
-  };
-
   const handleFlip = () => {
-    playSound();
+    if (sound) sound.play();
     handleClick();
   };
 
   return (
     <div
-      className={`card h-36 w-24 transform cursor-pointer rounded-lg bg-white shadow-md ${isFlipped ? "flipped" : ""}`}
+      key={id}
+      className="perspective-1000 h-36 w-24"
       onClick={handleFlip}
+      role="button"
+      tabIndex={0}
     >
-      <div className={`face relative h-full w-full`}>
-        {isFlipped ? (
-          <img
+      <div
+        className={cn(
+          "transform-style-preserve-3d relative h-full w-full transition-transform duration-500 ease-in-out",
+          {
+            "rotate-y-180": isFlipped,
+          },
+        )}
+      >
+        <div
+          className={cn(
+            "absolute inset-0 flex items-center justify-center rounded-lg bg-white shadow-md",
+            "backface-hidden",
+          )}
+        >
+          <Image
+            src="/media/front.png"
+            alt="Frente da carta"
+            className="h-full w-full object-contain p-2"
+            width={100}
+            height={150}
+          />
+        </div>
+        <div
+          className={cn(
+            "absolute inset-0 flex items-center justify-center rounded-lg bg-white shadow-md",
+            "rotate-y-180 backface-hidden",
+          )}
+        >
+          <Image
             src={`/media/${parrot}.gif`}
             alt={parrot}
-            className="absolute h-full w-full"
+            className="h-full w-full object-contain"
+            width={100}
+            height={150}
           />
-        ) : (
-          <img
-            src="/media/front.png"
-            alt="Parrot Front"
-            className="absolute h-full w-full p-2"
-          />
-        )}
+        </div>
       </div>
     </div>
   );
 };
 
-export default Card;
+export default MemoryCard;
