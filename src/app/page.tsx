@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, use } from "react";
 import MemoryCard from "./_components/card";
 import { Howl } from "howler";
 import VoiceCommand from "./_components/speech";
@@ -25,6 +25,7 @@ const parrots: string[] = [
   "unicornparrot",
 ];
 
+const victorySound = new Howl({ src: ["/sounds/victory.mp3"] });
 const winSound = new Howl({ src: ["/sounds/win.wav"] });
 const loseSound = new Howl({ src: ["/sounds/lose.wav"] });
 
@@ -107,7 +108,7 @@ const MemoryGame: React.FC = () => {
       ),
     );
 
-    playSound(card.parrot); // Play flip sound on card click
+    playSound(card.parrot);
 
     if (previousCard === undefined) {
       setPreviousCard(card);
@@ -115,7 +116,6 @@ const MemoryGame: React.FC = () => {
       if (previousCard.parrot === card.parrot) {
         setPreviousCard(undefined);
         winSound.play();
-        setTimeout(() => checkWin(), 1000);
       } else {
         loseSound.play();
         setTimeout(() => {
@@ -128,19 +128,25 @@ const MemoryGame: React.FC = () => {
             ),
           );
           setPreviousCard(undefined);
-        }, 1000);
+        }, 2000);
       }
     }
   };
 
-  const checkWin = () => {
-    if (cards.every((card) => card.isFlipped)) {
-      winSound.play();
-      alert(`You won in ${nClicks} clicks and ${timer} seconds!`);
-      setCards([]);
-      setupGame();
+  useEffect(() => {
+    if (ncards && cards.length > 0) {
+      if (cards.every((card) => card.isFlipped)) {
+        setTimeout(() => {
+          victorySound.play();
+          alert(`Voce ganhou em ${nClicks} clicks e ${timer} segundos!`);
+          setCards([]);
+          setNcards(undefined);
+          setupGame();
+        }, 2000);
+      }
     }
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cards]);
 
   return (
     <body className="bg-blue-100 p-8 md:px-[10%]">

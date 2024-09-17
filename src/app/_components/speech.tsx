@@ -24,8 +24,6 @@ const VoiceCommand: React.FC<SpeechRecognitionProps> = ({
       case "iniciar":
       case "jogar":
       case "começar":
-        startGame();
-        break;
       case "quatro cartas":
       case "4 cartas":
         selectNumberOfCards(4);
@@ -38,8 +36,13 @@ const VoiceCommand: React.FC<SpeechRecognitionProps> = ({
       case "8 cartas":
         selectNumberOfCards(8);
         break;
+      case "quatorze cartas":
+      case "14 cartas":
+      case "catorze cartas":
+        selectNumberOfCards(14);
+        break;
       default:
-        console.log(`Unknown command: ${command}`);
+        console.log(`Desconhecido: ${command}`);
         break;
     }
   };
