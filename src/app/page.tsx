@@ -20,7 +20,7 @@ const parrots: string[] = [
   "explodyparrot",
   "fiestaparrot",
   "metalparrot",
-  "revertitparrot",
+  "sailorparrot",
   "tripletsparrot",
   "unicornparrot",
 ];
@@ -33,7 +33,7 @@ const shuffleArray = <T,>(array: T[]): T[] => {
 };
 
 const MemoryGame: React.FC = () => {
-  const [ncards, setNcards] = useState<number>(4);
+  const [ncards, setNcards] = useState<number>();
   const [cards, setCards] = useState<MemoryCardType[]>([]);
   const [nClicks, setNClicks] = useState<number>(0);
   const [timer, setTimer] = useState<number>(0);
@@ -53,7 +53,6 @@ const MemoryGame: React.FC = () => {
     startSound.play();
   };
 
-  // Preload images for smoother flipping
   const preloadImages = (cards: MemoryCardType[]) => {
     cards.forEach((card) => {
       const img = new Image();
@@ -62,6 +61,7 @@ const MemoryGame: React.FC = () => {
   };
 
   const setupGame = useCallback(() => {
+    if (!ncards) return;
     const positions = shuffleArray([
       ...Array(ncards / 2).keys(),
       ...Array(ncards / 2).keys(),
@@ -77,13 +77,12 @@ const MemoryGame: React.FC = () => {
     setNClicks(0);
     setTimer(0);
     playGameStartSound();
-    preloadImages(cardSet); // Preload images when the game is set up
+    preloadImages(cardSet);
   }, [ncards]);
 
-  // Map parrots to sound objects
   const soundsMap = parrots.reduce(
     (map, parrot) => {
-      map[parrot] = new Howl({ src: [`/sounds/flip.wav`] });
+      map[parrot] = new Howl({ src: [`/sounds/parrots/${parrot}.mp3`] });
       return map;
     },
     {} as Record<string, Howl>,
@@ -177,6 +176,12 @@ const MemoryGame: React.FC = () => {
           className="rounded-lg bg-green-600 p-3 shadow-md"
         >
           8 Cartas
+        </Button>
+        <Button
+          onClick={() => setNcards(14)}
+          className="rounded-lg bg-green-600 p-3 shadow-md"
+        >
+          14 Cartas
         </Button>
       </div>
       <div

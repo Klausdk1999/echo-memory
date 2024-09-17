@@ -26,7 +26,7 @@ const MemoryCard: React.FC<MemoryCardProps> = ({
   return (
     <div
       key={id}
-      className="perspective-1000 h-36 w-24"
+      className="perspective-1000 h-36 w-28"
       onClick={handleFlip}
       role="button"
       tabIndex={0}
@@ -41,7 +41,7 @@ const MemoryCard: React.FC<MemoryCardProps> = ({
       >
         <div
           className={cn(
-            "absolute inset-0 flex items-center justify-center rounded-lg bg-white shadow-md",
+            "absolute inset-0 px-2 flex items-center justify-center rounded-lg bg-white shadow-md",
             "backface-hidden",
           )}
         >
