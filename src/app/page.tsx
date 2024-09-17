@@ -146,7 +146,7 @@ const MemoryGame: React.FC = () => {
   return (
     <body className="bg-blue-100 p-8 md:px-[10%]">
       <div className="flex justify-center">
-        <CardTitle className="mb-4 w-fit rounded-xl bg-blue-400 p-2 text-center text-4xl font-bold text-white">
+        <CardTitle className="mb-4 w-fit rounded-xl bg-blue-400 p-2 text-center text-4xl font-bold text-white shadow-md">
           Papagaios da Memória
         </CardTitle>
         <Badge className="text-l absolute right-0 top-0 m-4 w-[100px] justify-center bg-blue-950 p-2 text-center text-white">
