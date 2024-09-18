@@ -1,5 +1,4 @@
 import React from "react";
-import { type Howl } from "howler";
 import { cn } from "@/lib/utils"; // Utility class for conditional classnames
 import Image from "next/image";
 

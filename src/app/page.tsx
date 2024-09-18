@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useCallback, use } from "react";
+import React, { useState, useEffect, useCallback, use, useMemo } from "react";
 import MemoryCard from "./_components/card";
 import { Howl } from "howler";
 import VoiceCommand from "./_components/speech";
@@ -95,17 +95,8 @@ const MemoryGame: React.FC = () => {
       sound.fade(1, 0, 4500);
 
       sound.play();
-      //setTimeout(() => sound.stop(), 3000);
+      setTimeout(() => sound.stop(), 4000);
     }
-  };
-
-  const flipCardByIndex = (i: number) => {
-    if (!ncards) return;
-    if (i < 0 || i >= ncards) return;
-    const selectedCard = cards[i];
-    if (!cards[i]) return;
-    if (!selectedCard) return;
-    handleCardClick(selectedCard);
   };
 
   useEffect(() => {
@@ -113,6 +104,7 @@ const MemoryGame: React.FC = () => {
   }, [ncards, setupGame]);
 
   const handleCardClick = (card: MemoryCardType) => {
+    console.log(card.parrot, "atual");
     if (previousCard?.id === card.id) return;
     setNClicks((prev) => prev + 1);
 
@@ -123,10 +115,11 @@ const MemoryGame: React.FC = () => {
     );
 
     playSound(card.parrot);
-
+    console.log(previousCard, card);
     if (previousCard === undefined) {
       setPreviousCard(card);
     } else {
+      console.log(previousCard.parrot, card.parrot);
       if (previousCard.parrot === card.parrot) {
         setPreviousCard(undefined);
         winSound.play();
@@ -162,6 +155,55 @@ const MemoryGame: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cards]);
 
+  const flipCardByIndex = (i: number) => {
+    const selectedCard = cards[i];
+    if (!selectedCard) return;
+    handleCardClick(selectedCard);
+  };
+
+  const extractCardNumber = (command: string): number | null => {
+    const match = /\d+/.exec(command); // Extract any digits from the string
+    return match ? parseInt(match[0], 10) - 1 : null; // Return zero-indexed card number
+  };
+
+  const handleVoiceCommand = (command: string) => {
+    console.log("Comando de voz:", command);
+    const lowerCommand = command.toLowerCase();
+    const cardNumber = extractCardNumber(lowerCommand);
+    console.log(cards);
+    switch (true) {
+      // Match "virar cartão", "tirar cartão", "virar carta", and "tirar carta"
+      case /virar (cartão|carta)|tirar (cartão|carta)/.test(lowerCommand): {
+        if (cardNumber === undefined) break;
+        const selectedCard = cards[cardNumber ?? 0];
+        if (!selectedCard) return;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+        handleCardClick(selectedCard);
+
+        break;
+      }
+      case /iniciar|jogar|começar/.test(lowerCommand):
+        setNcards(4);
+        break;
+      case /quatro cartas|4 cartas/.test(lowerCommand):
+        setNcards(4);
+        break;
+      case /seis cartas|6 cartas/.test(lowerCommand):
+        setNcards(6);
+        break;
+      case /oito cartas|8 cartas/.test(lowerCommand):
+        setNcards(8);
+        break;
+      case /quatorze cartas|14 cartas|catorze cartas/.test(lowerCommand):
+        setNcards(14);
+        break;
+
+      default:
+        console.log(`Comando desconhecido: ${command}`);
+        break;
+    }
+  };
+
   return (
     <body className="bg-blue-100 p-8 md:px-[10%]">
       <div className="flex justify-center">
@@ -175,8 +217,8 @@ const MemoryGame: React.FC = () => {
 
       <div className="my-4 flex flex-col justify-center gap-4 md:flex-row">
         <VoiceCommand
-          flipCardByIndex={flipCardByIndex}
-          selectNumberOfCards={setNcards}
+          key={cards.length + JSON.stringify(previousCard)}
+          handleVoiceCommand={handleVoiceCommand}
         />
         <Button
           onClick={() => setNcards(4)}
