@@ -8,7 +8,6 @@ interface MemoryCardProps {
   parrot: string;
   isFlipped: boolean;
   handleClick: () => void;
-  sound?: Howl; // path to the sound for this card
 }
 
 const MemoryCard: React.FC<MemoryCardProps> = ({
@@ -16,18 +15,12 @@ const MemoryCard: React.FC<MemoryCardProps> = ({
   parrot,
   isFlipped,
   handleClick,
-  sound,
 }) => {
-  const handleFlip = () => {
-    if (sound) sound.play();
-    handleClick();
-  };
-
   return (
     <div
       key={id}
       className="perspective-1000 h-36 w-28"
-      onClick={handleFlip}
+      onClick={handleClick}
       role="button"
       tabIndex={0}
     >
@@ -41,7 +34,7 @@ const MemoryCard: React.FC<MemoryCardProps> = ({
       >
         <div
           className={cn(
-            "absolute inset-0 px-2 flex items-center justify-center rounded-lg bg-white shadow-md",
+            "absolute inset-0 flex items-center justify-center rounded-lg bg-white px-2 shadow-md",
             "backface-hidden",
           )}
         >

@@ -91,7 +91,21 @@ const MemoryGame: React.FC = () => {
 
   const playSound = (parrot: string) => {
     const sound = soundsMap[parrot];
-    if (sound) sound.play();
+    if (sound) {
+      sound.fade(1, 0, 4500);
+
+      sound.play();
+      //setTimeout(() => sound.stop(), 3000);
+    }
+  };
+
+  const flipCardByIndex = (i: number) => {
+    if (!ncards) return;
+    if (i < 0 || i >= ncards) return;
+    const selectedCard = cards[i];
+    if (!cards[i]) return;
+    if (!selectedCard) return;
+    handleCardClick(selectedCard);
   };
 
   useEffect(() => {
@@ -99,7 +113,7 @@ const MemoryGame: React.FC = () => {
   }, [ncards, setupGame]);
 
   const handleCardClick = (card: MemoryCardType) => {
-    if (previousCard?.id === card.id) return; // Prevent double-clicking the same card
+    if (previousCard?.id === card.id) return;
     setNClicks((prev) => prev + 1);
 
     setCards((prev) =>
@@ -161,8 +175,7 @@ const MemoryGame: React.FC = () => {
 
       <div className="my-4 flex flex-col justify-center gap-4 md:flex-row">
         <VoiceCommand
-          startGame={setupGame}
-          selectCard={handleCardClick}
+          flipCardByIndex={flipCardByIndex}
           selectNumberOfCards={setNcards}
         />
         <Button
@@ -200,7 +213,6 @@ const MemoryGame: React.FC = () => {
             parrot={card.parrot}
             isFlipped={card.isFlipped}
             handleClick={() => handleCardClick(card)}
-            sound={soundsMap[card.parrot]}
           />
         ))}
       </div>

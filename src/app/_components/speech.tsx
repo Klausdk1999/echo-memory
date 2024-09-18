@@ -1,48 +1,56 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import React, { useState } from "react";
-import { type MemoryCardType } from "../page";
 import { Button } from "@/components/ui/button";
 import { Mic, MicOff } from "lucide-react";
 
 interface SpeechRecognitionProps {
-  startGame: () => void;
-  selectCard: (card: MemoryCardType) => void;
+  flipCardByIndex: (index: number) => void;
   selectNumberOfCards: (n: number) => void;
 }
 
 const VoiceCommand: React.FC<SpeechRecognitionProps> = ({
-  startGame,
-  selectCard,
+  flipCardByIndex,
   selectNumberOfCards,
 }) => {
   const [listening, setListening] = useState(false);
 
+  // Function to extract the number from the command (e.g., "Carta 1" -> 1)
+  const extractCardNumber = (command: string): number | null => {
+    const match = /\d+/.exec(command); // Extract any digits from the string
+    return match ? parseInt(match[0], 10) - 1 : null; // Return zero-indexed card number
+  };
+
   const handleVoiceCommand = (command: string) => {
-    switch (command.toLowerCase()) {
-      case "iniciar":
-      case "jogar":
-      case "começar":
-      case "quatro cartas":
-      case "4 cartas":
+    const lowerCommand = command.toLowerCase();
+    const cardNumber = extractCardNumber(lowerCommand);
+
+    switch (true) {
+      case lowerCommand.includes("virar cartão"):
+        flipCardByIndex(0); // Zero-indexed for "Carta 1"
+        break;
+      case /iniciar|jogar|começar/.test(lowerCommand):
         selectNumberOfCards(4);
         break;
-      case "seis cartas":
-      case "6 cartas":
+      case /quatro cartas|4 cartas/.test(lowerCommand):
+        selectNumberOfCards(4);
+        break;
+      case /seis cartas|6 cartas/.test(lowerCommand):
         selectNumberOfCards(6);
         break;
-      case "oito cartas":
-      case "8 cartas":
+      case /oito cartas|8 cartas/.test(lowerCommand):
         selectNumberOfCards(8);
         break;
-      case "quatorze cartas":
-      case "14 cartas":
-      case "catorze cartas":
+      case /quatorze cartas|14 cartas|catorze cartas/.test(lowerCommand):
         selectNumberOfCards(14);
         break;
+      case lowerCommand.includes("virar carta") && cardNumber !== null:
+        // Flip the specified card if a valid number is provided
+        flipCardByIndex(cardNumber);
+        break;
       default:
-        console.log(`Desconhecido: ${command}`);
+        console.log(`Comando desconhecido: ${command}`);
         break;
     }
   };
@@ -62,13 +70,18 @@ const VoiceCommand: React.FC<SpeechRecognitionProps> = ({
       };
 
       recognition.onerror = (event: unknown) => {
-        console.error("Speech recognition error:", event);
+        console.error("Erro de reconhecimento de fala:", event);
         setListening(false);
       };
+
+      recognition.onend = () => {
+        setListening(false);
+      };
+
       setListening(true);
       recognition.start();
     } else {
-      console.error("SpeechRecognition is not supported in this browser.");
+      console.error("Reconhecimento de fala não é suportado neste navegador.");
     }
   };
 
