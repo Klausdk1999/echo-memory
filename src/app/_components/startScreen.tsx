@@ -28,11 +28,11 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center bg-blue-900 text-white transition-transform duration-700 ${
+      className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-blue-900 text-white transition-transform duration-700 ${
         hidden ? "translate-y-full" : "translate-y-0"
       }`}
     >
-      <h1 className="pb-4 text-2xl font-bold">Jogo Papagaios da Memória</h1>
+      <h1 className="pb-10 text-2xl font-bold">Jogo Papagaios da Memória</h1>
       <h1 className="text-4xl font-bold">Aperte qualquer tecla para iniciar</h1>
     </div>
   );
