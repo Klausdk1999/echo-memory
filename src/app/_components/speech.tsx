@@ -50,7 +50,7 @@ const VoiceListener: React.FC<SpeechRecognitionProps> = ({
       } else {
         if (previousCard.parrot === card.parrot) {
           setPreviousCard(undefined);
-          winSound.volume(0.3);
+          winSound.volume(0.2);
           winSound.play();
         } else {
           loseSound.volume(0.3);

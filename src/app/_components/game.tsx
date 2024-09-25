@@ -37,6 +37,7 @@ const MemoryGame: React.FC = () => {
   const [previousCard, setPreviousCard] = useState<
     MemoryCardType | undefined
   >();
+  const [clickDisabled, setClickDisabled] = useState<boolean>(false);
 
   useEffect(() => {
     if (ncards && ncards % 2 === 0) {
@@ -58,7 +59,7 @@ const MemoryGame: React.FC = () => {
       ...Array(ncards / 2).keys(),
       ...Array(ncards / 2).keys(),
     ]);
-    
+
     const shuffledParrots = shuffleArray(parrots).slice(0, ncards / 2);
 
     const cardSet = positions.map((pos, i) => ({
@@ -79,6 +80,7 @@ const MemoryGame: React.FC = () => {
   }, [ncards, setupGame]);
 
   const handleCardClick = (card: MemoryCardType) => {
+    setClickDisabled(true);
     if (previousCard?.id === card.id) return;
     setNClicks((prev) => prev + 1);
 
@@ -91,11 +93,13 @@ const MemoryGame: React.FC = () => {
     PlaySound(card.parrot);
     if (previousCard === undefined) {
       setPreviousCard(card);
+      setClickDisabled(false);
     } else {
       if (previousCard.parrot === card.parrot) {
         setPreviousCard(undefined);
-        winSound.volume(0.3);
+        winSound.volume(0.2);
         winSound.play();
+        setTimeout(() => setClickDisabled(false), 1000);
       } else {
         loseSound.volume(0.3);
         loseSound.play();
@@ -109,6 +113,7 @@ const MemoryGame: React.FC = () => {
             ),
           );
           setPreviousCard(undefined);
+          setClickDisabled(false);
         }, 2000);
       }
     }
@@ -186,7 +191,15 @@ const MemoryGame: React.FC = () => {
             id={card.id}
             parrot={card.parrot}
             isFlipped={card.isFlipped}
-            handleClick={() => handleCardClick(card)}
+            handleClick={
+              clickDisabled
+                ? () => {
+                    //
+                  }
+                : () => {
+                    handleCardClick(card);
+                  }
+            }
           />
         ))}
       </div>
