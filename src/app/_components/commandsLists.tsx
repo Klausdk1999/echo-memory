@@ -14,6 +14,11 @@ const CommandList = () => (
       Comandos
     </PopoverTrigger>
     <PopoverContent className="w-[400px] rounded bg-white p-4 shadow-md">
+      <p className="text-gray-800">
+        Caso seu navegador seja compatível, você pode utilizar comandos de voz
+        para jogar. Atualmente somente o Mozilla Firefox não suporta essa
+        função.
+      </p>
       <ul className="list-disc space-y-2 pl-5">
         <li className="text-gray-800">
           <strong>Iniciar jogo:</strong> Diga{" "}
