@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CardTitle } from "@/components/ui/card";
 import { loseSound, PlaySound, victorySound, winSound } from "./sounds";
+import CommandList from "./commandsLists";
 
 // Define types for the cards
 export type MemoryCardType = {
@@ -146,6 +147,7 @@ const MemoryGame: React.FC = () => {
         </Badge>
       </div>
       <div className="my-4 flex flex-col justify-center gap-4 md:flex-row">
+        <CommandList />
         <VoiceCommand
           key={cards.length + JSON.stringify(previousCard)}
           cards={cards}

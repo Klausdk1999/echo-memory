@@ -40,20 +40,16 @@ export const handleVoiceCommand = (
   setNcards: React.Dispatch<React.SetStateAction<number | undefined>>,
   handleCardClick: (card: MemoryCardType) => void,
 ) => {
-  console.log("Comando de voz:", command);
   const lowerCommand = command.toLowerCase();
   const cardNumber = extractCardNumber(lowerCommand);
-  console.log(cards);
   switch (true) {
     case lowerCommand.includes("virar cartão"): {
-      console.log(`virar`, 0);
       const selectedCard = cards[0];
       if (!selectedCard) return;
       handleCardClick(selectedCard);
       break;
     }
     case /virar (cartão|carta)|tirar (cartão|carta)/.test(lowerCommand): {
-      console.log(`virar`, cardNumber);
       if (cardNumber === null) break;
       const selectedCard = cards[cardNumber];
       if (!selectedCard) return;
