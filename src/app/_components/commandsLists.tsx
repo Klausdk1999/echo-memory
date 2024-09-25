@@ -17,7 +17,7 @@ const CommandList = () => (
       <p className="text-gray-800">
         Caso seu navegador seja compatível, você pode utilizar comandos de voz
         para jogar. Atualmente somente o Mozilla Firefox não suporta essa
-        função.
+        função, recomendamos uso do Google Chrome.
       </p>
       <ul className="list-disc space-y-2 pl-5">
         <li className="text-gray-800">
