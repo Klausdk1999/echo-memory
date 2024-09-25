@@ -3,13 +3,6 @@ import React, { useState } from "react";
 import StartScreen from "./_components/startScreen";
 import MemoryGame from "./_components/game";
 
-// Define types for the cards
-export type MemoryCardType = {
-  id: number;
-  parrot: string;
-  isFlipped: boolean;
-};
-
 const Base: React.FC = () => {
   const [gameStarted, setGameStarted] = useState(false);
 

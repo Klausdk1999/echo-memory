@@ -11,20 +11,21 @@ const playGameStartSound = () => {
 const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
   const [hidden, setHidden] = useState(false);
 
-  const handleKeyPress = () => {
-    setHidden(true);
-    playGameStartSound();
-
-    onStart();
-  };
-
   useEffect(() => {
+    const handleKeyPress = () => {
+      setHidden(true);
+      playGameStartSound();
+
+      onStart();
+    };
+
     window.addEventListener("keydown", handleKeyPress);
     window.addEventListener("click", handleKeyPress);
     return () => {
       window.removeEventListener("keydown", handleKeyPress);
+      window.removeEventListener("click", handleKeyPress);
     };
-  }, []);
+  }, [onStart]);
 
   return (
     <div

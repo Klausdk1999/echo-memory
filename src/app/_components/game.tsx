@@ -1,11 +1,11 @@
 "use client";
 import React, { useState, useEffect, useCallback } from "react";
 import MemoryCard from "./card";
-import { Howl } from "howler";
 import VoiceCommand from "./speech";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CardTitle } from "@/components/ui/card";
+import { loseSound, PlaySound, victorySound, winSound } from "./sounds";
 
 // Define types for the cards
 export type MemoryCardType = {
@@ -24,10 +24,6 @@ const parrots: string[] = [
   "tripletsparrot",
   "unicornparrot",
 ];
-
-const victorySound = new Howl({ src: ["/sounds/victory.mp3"] });
-const winSound = new Howl({ src: ["/sounds/win.wav"] });
-const loseSound = new Howl({ src: ["/sounds/lose.wav"] });
 
 const shuffleArray = <T,>(array: T[]): T[] => {
   return array.sort(() => Math.random() - 0.5);
@@ -76,24 +72,6 @@ const MemoryGame: React.FC = () => {
     preloadImages(cardSet);
   }, [ncards]);
 
-  const soundsMap = parrots.reduce(
-    (map, parrot) => {
-      map[parrot] = new Howl({ src: [`/sounds/parrots/${parrot}.mp3`] });
-      return map;
-    },
-    {} as Record<string, Howl>,
-  );
-
-  const playSound = (parrot: string) => {
-    const sound = soundsMap[parrot];
-    if (sound) {
-      sound.fade(1, 0, 4500);
-
-      sound.play();
-      setTimeout(() => sound.stop(), 4000);
-    }
-  };
-
   useEffect(() => {
     setupGame();
   }, [ncards, setupGame]);
@@ -108,7 +86,7 @@ const MemoryGame: React.FC = () => {
       ),
     );
 
-    playSound(card.parrot);
+    PlaySound(card.parrot);
     if (previousCard === undefined) {
       setPreviousCard(card);
     } else {
@@ -137,7 +115,7 @@ const MemoryGame: React.FC = () => {
       if (cards.every((card) => card.isFlipped)) {
         setTimeout(() => {
           victorySound.play();
-          alert(`Voce ganhou em ${nClicks} clicks e ${timer} segundos!`);
+          alert(`Voce ganhou em ${nClicks} ações e ${timer} segundos!`);
           setCards([]);
           setNcards(undefined);
           setupGame();
@@ -147,47 +125,6 @@ const MemoryGame: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cards]);
 
-  const extractCardNumber = (command: string): number | null => {
-    const match = /\d+/.exec(command); // Extract any digits from the string
-    return match ? parseInt(match[0], 10) - 1 : null; // Return zero-indexed card number
-  };
-
-  const handleVoiceCommand = (command: string) => {
-    console.log("Comando de voz:", command);
-    const lowerCommand = command.toLowerCase();
-    const cardNumber = extractCardNumber(lowerCommand);
-    console.log(cards);
-    switch (true) {
-      case /virar (cartão|carta)|tirar (cartão|carta)/.test(lowerCommand): {
-        if (cardNumber === undefined) break;
-        const selectedCard = cards[cardNumber ?? 0];
-        if (!selectedCard) return;
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-        handleCardClick(selectedCard);
-
-        break;
-      }
-      case /iniciar|jogar|começar/.test(lowerCommand):
-        setNcards(4);
-        break;
-      case /quatro cartas|4 cartas/.test(lowerCommand):
-        setNcards(4);
-        break;
-      case /seis cartas|6 cartas/.test(lowerCommand):
-        setNcards(6);
-        break;
-      case /oito cartas|8 cartas/.test(lowerCommand):
-        setNcards(8);
-        break;
-      case /quatorze cartas|14 cartas|catorze cartas/.test(lowerCommand):
-        setNcards(14);
-        break;
-
-      default:
-        console.log(`Comando desconhecido: ${command}`);
-        break;
-    }
-  };
 
   return (
     <div className="bg-blue-100 p-8 md:px-[10%]">
@@ -202,7 +139,14 @@ const MemoryGame: React.FC = () => {
       <div className="my-4 flex flex-col justify-center gap-4 md:flex-row">
         <VoiceCommand
           key={cards.length + JSON.stringify(previousCard)}
-          handleVoiceCommand={handleVoiceCommand}
+          cards={cards}
+          setCards={setCards}
+          previousCard={previousCard}
+          setPreviousCard={setPreviousCard}
+          nClicks={nClicks}
+          setNClicks={setNClicks}
+          ncards={ncards}
+          setNcards={setNcards}
         />
         <Button
           onClick={() => setNcards(4)}
