@@ -35,8 +35,6 @@ const VoiceListener: React.FC<SpeechRecognitionProps> = ({
 
   useEffect(() => {
     const handleCardClick = (card: MemoryCardType) => {
-      console.log(`cards no click`, cards);
-      console.log("Clicou no card", card, previousCard);
       if (previousCard?.id === card.id) return;
       setNClicks((prev) => prev + 1);
 
@@ -52,8 +50,10 @@ const VoiceListener: React.FC<SpeechRecognitionProps> = ({
       } else {
         if (previousCard.parrot === card.parrot) {
           setPreviousCard(undefined);
+          winSound.volume(0.3);
           winSound.play();
         } else {
+          loseSound.volume(0.3);
           loseSound.play();
           setTimeout(() => {
             setCards((prev) =>

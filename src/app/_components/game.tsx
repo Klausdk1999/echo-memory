@@ -58,11 +58,13 @@ const MemoryGame: React.FC = () => {
       ...Array(ncards / 2).keys(),
       ...Array(ncards / 2).keys(),
     ]);
+    
+    const shuffledParrots = shuffleArray(parrots).slice(0, ncards / 2);
 
     const cardSet = positions.map((pos, i) => ({
       id: i,
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      parrot: parrots[pos] ?? "defaultparrot",
+      parrot: shuffledParrots[pos] ?? "defaultparrot",
       isFlipped: false,
     }));
 
@@ -92,8 +94,10 @@ const MemoryGame: React.FC = () => {
     } else {
       if (previousCard.parrot === card.parrot) {
         setPreviousCard(undefined);
+        winSound.volume(0.3);
         winSound.play();
       } else {
+        loseSound.volume(0.3);
         loseSound.play();
         setTimeout(() => {
           setCards((prev) =>
@@ -114,6 +118,7 @@ const MemoryGame: React.FC = () => {
     if (ncards && cards.length > 0) {
       if (cards.every((card) => card.isFlipped)) {
         setTimeout(() => {
+          victorySound.volume(0.5);
           victorySound.play();
           alert(`Voce ganhou em ${nClicks} ações e ${timer} segundos!`);
           setCards([]);
@@ -124,7 +129,6 @@ const MemoryGame: React.FC = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cards]);
-
 
   return (
     <div className="bg-blue-100 p-8 md:px-[10%]">

@@ -1,11 +1,12 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import { startSound } from "./sounds";
 
 interface StartScreenProps {
   onStart: () => void;
 }
 const playGameStartSound = () => {
-  const startSound = new Howl({ src: ["/sounds/start.wav"] });
+  startSound.volume(0.3);
   startSound.play();
 };
 const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
